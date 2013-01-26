@@ -5,10 +5,10 @@
 	<script type="text/javascript" src="js/jquery/jquery-1.9.0.min.js"></script>
 	<script type="text/javascript" src="js/jquery/mousewheel.js"></script>
 	<script type="text/javascript" src="js/audiolibjs/audiolib.js"></script>
-	<script type="text/javascript" src="js/samples/kickRaw.js"></script>
-	<script type="text/javascript" src="js/samples/snareRaw2.js"></script>
-    <script type="text/javascript" src="js/samples/hatraw.js"></script>
-    <script type="text/javascript" src="js/samples/hat2raw.js"></script>
+	<script type="text/javascript" src="js/samples/kick.js"></script>
+	<script type="text/javascript" src="js/samples/snare.js"></script>
+    <script type="text/javascript" src="js/samples/hat1.js"></script>
+    <script type="text/javascript" src="js/samples/hat2.js"></script>
     <script type="text/javascript" src="js/samples/synthRaw.js"></script>
 	<script type="text/javascript">
 
@@ -16,10 +16,10 @@ var device, keyIsDown = false, multiOsc, osc1, osc2, osc3, chorusL, chorusR, env
 	releasing, lfo1, lfo2, wobbleLfo, tempo = 140, wobbleStep = 2, filter, cutoff = 6000, reverb, synthReverb, delay,
 	kickSampler, snareSampler, hatSampler, hat2Sampler, synthSampler, tickCounter = 1, beatFractionConst, stepIndex = 100;
 
-var kickSample = atob(kickRaw);
-var snareSample = atob(snareRaw);
-var hatSample = atob(hatRaw);
-var hat2Sample = atob(hat2Raw);
+var kickSample = atob(kick);
+var snareSample = atob(snare);
+var hatSample = atob(hat1);
+var hat2Sample = atob(hat2);
 var synthSample = atob(synthRaw);
 
 var drumSequence = {
