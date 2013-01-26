@@ -14,7 +14,8 @@
 
 var device, keyIsDown = false, multiOsc, osc1, osc2, osc3, chorusL, chorusR, envelope, 
 	releasing, lfo1, lfo2, wobbleLfo, tempo = 140, wobbleStep = 2, filter, cutoff = 6000, reverb, synthReverb, delay,
-	kickSampler, snareSampler, hatSampler, hat2Sampler, synthSampler, tickCounter = 1, beatFractionConst, stepIndex = 100;
+	kickSampler, snareSampler, hatSampler, hat2Sampler, synthSampler, tickCounter = 1, beatFractionConst, stepIndex = 100,
+    playing = false;
 
 var kickSample = atob(kick);
 var snareSample = atob(snare);
@@ -25,12 +26,8 @@ var synthSample = atob(synthRaw);
 var drumSequence = {
 	steps: [
         { step: 0, sampler: 'synth' , hz: 440 },
-
-
         { step: 16, sampler: 'synth' , hz: 200 },
-
         { step: 24, sampler: 'synth' , hz: 175 },
-
 		{ step: 0, sampler: 'kick', hz: 440 },
         { step: 2, sampler: 'hat', hz: 440 },
 		{ step: 3, sampler: 'kick', hz: 440 },
@@ -55,6 +52,8 @@ var drumSequence = {
 
 var audioCallback = function(buffer, channels){
 	
+    if (!playing) return;
+    
 	var sample = 0;
 	var kickSampleL = 0;
 	var kickSampleR = 0;
@@ -216,6 +215,10 @@ window.addEventListener('load', function(){
     	}
     });
 
+    $('#playButton').click(function(){
+        playing = !playing;
+    });
+
     processWobbleStep();
     
 }, true);
@@ -252,6 +255,9 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
 		<li>Use the mouse wheel to increase or decrease wobble speed.</li>
 		<li>Use the up arrow key to cycle through wobble types (sine, sawtooth, and inverted sawtooth).</li>
 	</ul>
+    <p>
+        <button id="playButton">play/pause</button>
+    </p>
 </body>
 
 
