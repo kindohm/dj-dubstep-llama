@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<script type="text/javascript" src="js/jquery/jquery-1.9.0.min.js"></script>
+	<script type="text/javascript" src="js/jquery/mousewheel.js"></script>
+	<script type="text/javascript" src="js/audiolibjs/audiolib.js"></script>
+	<script type="text/javascript" src="js/samples/kickRaw.js"></script>
+	<script type="text/javascript" src="js/samples/snareRaw2.js"></script>
+    <script type="text/javascript" src="js/samples/hatraw.js"></script>
+    <script type="text/javascript" src="js/samples/hat2raw.js"></script>
+    <script type="text/javascript" src="js/samples/synthRaw.js"></script>
+	<script type="text/javascript">
+
+var device, keyIsDown = false, multiOsc, osc1, osc2, osc3, chorusL, chorusR, envelope, 
+	releasing, lfo1, lfo2, wobbleLfo, tempo = 140, wobbleStep = 2, filter, cutoff = 6000, reverb, synthReverb, delay,
+	kickSampler, snareSampler, hatSampler, hat2Sampler, synthSampler, tickCounter = 1, beatFractionConst, stepIndex = 100;
+
+var kickSample = atob(kickRaw);
+var snareSample = atob(snareRaw);
+var hatSample = atob(hatRaw);
+var hat2Sample = atob(hat2Raw);
+var synthSample = atob(synthRaw);
+
+var drumSequence = {
+	steps: [
+        { step: 0, sampler: 'synth' , hz: 440 },
+
+
+        { step: 16, sampler: 'synth' , hz: 200 },
+
+        { step: 24, sampler: 'synth' , hz: 175 },
+
+		{ step: 0, sampler: 'kick', hz: 440 },
+        { step: 2, sampler: 'hat', hz: 440 },
+		{ step: 3, sampler: 'kick', hz: 440 },
+        { step: 6, sampler: 'hat2' , hz: 440 },
+		{ step: 8, sampler: 'snare' , hz: 440 },
+        { step: 10, sampler: 'hat' , hz: 440 },
+        { step: 11, sampler: 'hat2' , hz: 440 },
+        { step: 14, sampler: 'hat2' , hz: 440 },
+        { step: 15, sampler: 'hat' , hz: 440 },
+		{ step: 16, sampler: 'kick' , hz: 440 },
+        { step: 19, sampler: 'hat' , hz: 440 },
+        { step: 22, sampler: 'hat2' , hz: 440 },
+        { step: 23, sampler: 'hat' , hz: 440 },
+		{ step: 24, sampler: 'snare' , hz: 440 },
+        { step: 26, sampler: 'hat' , hz: 440 },
+        { step: 27, sampler: 'hat2' , hz: 440 },
+        { step: 29, sampler: 'hat2' , hz: 440 },
+        { step: 30, sampler: 'hat' , hz: 440 },
+        { step: 31, sampler: 'hat2' , hz: 440 },
+	]
+};
+
+var audioCallback = function(buffer, channels){
+	
+	var sample = 0;
+	var kickSampleL = 0;
+	var kickSampleR = 0;
+	var sampler;
+	var s, step;
+    var synthL, synthR;
+
+	for (var i = 0; i < buffer.length; i+=2) {
+		sample = 0;
+		osc1.generate();
+		osc2.generate();
+		osc3.generate();
+		lfo1.generate();
+		lfo2.generate();
+
+        osc2.fm = lfo1.getMix();
+        osc3.fm = lfo2.getMix();
+
+		sample = osc1.getMix() * .5 
+			+ osc2.getMix() * .5
+			+ osc3.getMix() * .3;
+		sample = sample * .4;
+
+		if (wobbleLfo.frequency !== 0){
+			wobbleLfo.generate();
+			filter.cutoff = cutoff * ((wobbleLfo.getMix() + 1) * 0.5);
+		}
+
+		filter.pushSample(sample);
+		sample = filter.getMix();
+
+		envelope.generate();
+		sample = sample * envelope.getMix();
+
+    	tickCounter = tickCounter + beatFractionConst;
+
+    	if (tickCounter >= 1){
+    		tickCounter = 0;
+
+    		stepIndex += 1;
+    		if (stepIndex >= 32){
+    			stepIndex = 0;
+    		}
+
+    		for (s = 0; s < drumSequence.steps.length; s++){
+    			step = drumSequence.steps[s];
+    			if (step.step === stepIndex){
+    				if (step.sampler === 'kick'){
+    					kickSampler.noteOn(step.hz);
+    				} else if (step.sampler === 'snare'){
+    					snareSampler.noteOn(step.hz);
+                    } else if (step.sampler === 'hat'){
+                        hatSampler.noteOn(step.hz);
+                    } else if (step.sampler === 'hat2'){
+                        hat2Sampler.noteOn(step.hz);
+                    } else if (step.sampler === 'synth'){
+                        synthSampler.noteOn(step.hz);
+                    }
+    			}
+    		}
+
+    	}
+
+		kickSampler.generate();
+    	kickSampleL = kickSampler.getMix(0) * .3;
+    	kickSampleR = kickSampler.getMix(1) * .3;
+
+		snareSampler.generate();
+    	kickSampleL += snareSampler.getMix(0) * .3;
+    	kickSampleR += snareSampler.getMix(1) * .3;
+
+        hatSampler.generate();
+        kickSampleL += hatSampler.getMix(0) * .2;
+        kickSampleR += hatSampler.getMix(1) * .2;
+
+        hat2Sampler.generate();
+        kickSampleL += hat2Sampler.getMix(0) * .15;
+        kickSampleR += hat2Sampler.getMix(1) * .15;
+
+        synthSampler.generate();
+        synthL = synthSampler.getMix(0) * .3;
+
+        synthReverb.pushSample(synthL, 0);
+        synthReverb.pushSample(synthL, 1);
+
+        reverb.pushSample(sample, 0);
+        reverb.pushSample(sample, 1);
+
+		buffer[i] = reverb.getMix(0) + synthReverb.getMix(0) + kickSampleL;
+		buffer[i+1] = reverb.getMix(1) + synthReverb.getMix(1) + kickSampleR;
+	}
+}
+
+var wobbleShape;
+
+window.addEventListener('load', function(){
+
+    device = audioLib.AudioDevice(audioCallback, 2);
+    osc1 = audioLib.Oscillator(device.sampleRate, 0);
+    osc2 = audioLib.Oscillator(device.sampleRate, 0);
+    osc2.waveShape = 'sawtooth';
+    osc3 = audioLib.Oscillator(device.sampleRate, 0);
+    osc3.waveShape = 'square';
+
+    envelope = audioLib.ADSREnvelope(device.sampleRate, 5, 1, 1, 50, null, null);
+    lfo1 = audioLib.Oscillator(device.sampleRate, 200);
+    lfo2 = audioLib.Oscillator(device.sampleRate, 190);
+    wobbleLfo = audioLib.Oscillator(device.sampleRate, 0);
+    wobbleLfo.waveShape = 'sine';
+
+    filter = audioLib.IIRFilter(device.sampleRate, cutoff);
+    bandPass = audioLib.IIRFilter(device.sampleRate, 3000, 0.5, 2);
+
+    reverb = audioLib.Reverb(device.sampleRate, 2, .5, .5, .6);
+    synthReverb = audioLib.Reverb(device.sampleRate, 2, .8, .5, .8);
+
+    kickSampler = audioLib.Sampler(device.sampleRate);
+    kickSampler.loadWav(kickSample, true);
+    snareSampler = audioLib.Sampler(device.sampleRate);
+    snareSampler.loadWav(snareSample, true);
+    hatSampler = audioLib.Sampler(device.sampleRate);
+    hatSampler.loadWav(hatSample, true);
+    hat2Sampler = audioLib.Sampler(device.sampleRate);
+    hat2Sampler.loadWav(hat2Sample, true);
+    synthSampler = audioLib.Sampler(device.sampleRate);
+    synthSampler.loadWav(synthSample, true);
+
+
+    beatFractionConst = 1 / device.sampleRate * tempo / 60;
+    beatFractionConst = beatFractionConst * 4;
+
+    $(document).keydown(function(k){
+    	if (!keyIsDown) {
+
+    		if (k.which === 38) {
+    			if (wobbleLfo.waveShape === 'sine') {
+    				wobbleLfo.waveShape = 'invSawtooth';
+    			} else if (wobbleLfo.waveShape === 'invSawtooth'){
+    				wobbleLfo.waveShape = 'sawtooth';
+    			} else if (wobbleLfo.waveShape === 'sawtooth') {
+    				wobbleLfo.waveShape = 'sine';
+    			}
+    		} else {
+	    		keyIsDown = true;
+	    		envelope.triggerGate(true);
+	    		//wobbleLfo.reset();
+	    		osc1.frequency = k.which * 1.5;
+                osc2.frequency = osc3.frequency = osc1.frequency * 3;
+                lfo1.frequency = osc1.frequency * 4;
+                lfo2.frequency = osc1.frequency * 4.5;
+	    	}
+    	}
+    });
+
+    $(document).keyup(function(k){
+    	if (keyIsDown){
+    		keyIsDown = false;
+    		envelope.triggerGate(false);
+    	}
+    });
+
+    processWobbleStep();
+    
+}, true);
+
+var processWobbleStep = function(){
+    wobbleLfo.frequency = tempo / 60 * wobbleStep * 0.5;
+    filter.cutoff = cutoff;
+};
+
+$(document).mousewheel(function(event, delta, deltaX, deltaY) {
+    wobbleStep += delta;
+
+    while (wobbleStep === 5 || wobbleStep === 7) {
+    	wobbleStep += delta;
+    }
+
+    wobbleStep = wobbleStep < 0 ? 0 : wobbleStep;
+    wobbleStep = wobbleStep > 8 ? 8 : wobbleStep;
+    processWobbleStep();
+});
+
+	</script>
+	
+	<style>
+	body{
+		font-family: Helvetica, Arial, sans-serif;
+	}
+	</style>
+</head>
+
+<body>
+	<ul>
+		<li>Press any key on the keyboard to play a note. Keys don't really map to a real note yet. </li>
+		<li>Use the mouse wheel to increase or decrease wobble speed.</li>
+		<li>Use the up arrow key to cycle through wobble types (sine, sawtooth, and inverted sawtooth).</li>
+	</ul>
+</body>
+
+
+
+
+</html>
