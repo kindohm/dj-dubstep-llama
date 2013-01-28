@@ -5,6 +5,7 @@
 	<script type="text/javascript" src="js/jquery/jquery-1.9.0.min.js"></script>
 	<script type="text/javascript" src="js/jquery/mousewheel.js"></script>
 	<script type="text/javascript" src="js/audiolibjs/audiolib.js"></script>
+    <script type="text/javascript" src="js/voice.js"></script>
 	<script type="text/javascript" src="js/samples/kick.js"></script>
 	<script type="text/javascript" src="js/samples/snare.js"></script>
     <script type="text/javascript" src="js/samples/hat1.js"></script>
@@ -12,8 +13,8 @@
     <script type="text/javascript" src="js/samples/synthraw.js"></script>
 	<script type="text/javascript">
 
-var device, keyIsDown = false, multiOsc, osc1, osc2, osc3, chorusL, chorusR, envelope, 
-	releasing, lfo1, lfo2, wobbleLfo, tempo = 140, wobbleStep = 2, filter, cutoff = 6000, reverb, synthReverb, delay,
+var device, keyIsDown = false, chorusL, chorusR, envelope, voices = [], voiceIds = [],
+	wobbleLfo, tempo = 140, wobbleStep = 2, filter, cutoff = 6000, reverb, synthReverb, delay,
 	kickSampler, snareSampler, hatSampler, hat2Sampler, synthSampler, tickCounter = 1, beatFractionConst, stepIndex = 100,
     playing = false;
 
@@ -53,29 +54,21 @@ var drumSequence = {
 var audioCallback = function(buffer, channels){
 	
     if (!playing) return;
-    
+
 	var sample = 0;
 	var kickSampleL = 0;
 	var kickSampleR = 0;
 	var sampler;
 	var s, step;
-    var synthL, synthR;
+    var synthL, synthR, v;
 
 	for (var i = 0; i < buffer.length; i+=2) {
 		sample = 0;
-		osc1.generate();
-		osc2.generate();
-		osc3.generate();
-		lfo1.generate();
-		lfo2.generate();
 
-        osc2.fm = lfo1.getMix();
-        osc3.fm = lfo2.getMix();
-
-		sample = osc1.getMix() * .5 
-			+ osc2.getMix() * .5
-			+ osc3.getMix() * .3;
-		sample = sample * .4;
+        for (v = 0; v < voices.length; v++){
+            voices[v].generate();
+            sample += voices[v].getMix() / voices.length;
+        }
 
 		if (wobbleLfo.frequency !== 0){
 			wobbleLfo.generate();
@@ -84,9 +77,6 @@ var audioCallback = function(buffer, channels){
 
 		filter.pushSample(sample);
 		sample = filter.getMix();
-
-		envelope.generate();
-		sample = sample * envelope.getMix();
 
     	tickCounter = tickCounter + beatFractionConst;
 
@@ -144,23 +134,21 @@ var audioCallback = function(buffer, channels){
 
 		buffer[i] = reverb.getMix(0) + synthReverb.getMix(0) + kickSampleL;
 		buffer[i+1] = reverb.getMix(1) + synthReverb.getMix(1) + kickSampleR;
+
+        // remove expired voices
+        for (v = voices.length - 1; v >= 0; v--){
+            if (voices[v].finished){
+                console.log('removing '+ v);
+                voices.splice(v);
+                voiceIds.splice(v);
+            }
+        }
 	}
 }
-
-var wobbleShape;
 
 window.addEventListener('load', function(){
 
     device = audioLib.AudioDevice(audioCallback, 2);
-    osc1 = audioLib.Oscillator(device.sampleRate, 0);
-    osc2 = audioLib.Oscillator(device.sampleRate, 0);
-    osc2.waveShape = 'sawtooth';
-    osc3 = audioLib.Oscillator(device.sampleRate, 0);
-    osc3.waveShape = 'square';
-
-    envelope = audioLib.ADSREnvelope(device.sampleRate, 5, 1, 1, 50, null, null);
-    lfo1 = audioLib.Oscillator(device.sampleRate, 200);
-    lfo2 = audioLib.Oscillator(device.sampleRate, 190);
     wobbleLfo = audioLib.Oscillator(device.sampleRate, 0);
     wobbleLfo.waveShape = 'sine';
 
@@ -186,7 +174,7 @@ window.addEventListener('load', function(){
     beatFractionConst = beatFractionConst * 4;
 
     $(document).keydown(function(k){
-    	if (!keyIsDown) {
+    	
 
     		if (k.which === 38) {
     			if (wobbleLfo.waveShape === 'sine') {
@@ -197,22 +185,23 @@ window.addEventListener('load', function(){
     				wobbleLfo.waveShape = 'sine';
     			}
     		} else {
-	    		keyIsDown = true;
-	    		envelope.triggerGate(true);
-	    		//wobbleLfo.reset();
-	    		osc1.frequency = k.which * 1.5;
-                osc2.frequency = osc3.frequency = osc1.frequency * 3;
-                lfo1.frequency = osc1.frequency * 4;
-                lfo2.frequency = osc1.frequency * 4.5;
+                if (voiceIds.indexOf(k.which) === -1){
+                    var voice = new Voice(device.sampleRate, k.which, k.which * 1.5);
+                    voices.push(voice);
+                    voiceIds.push(k.which);
+                }
 	    	}
-    	}
+    	
     });
 
     $(document).keyup(function(k){
-    	if (keyIsDown){
-    		keyIsDown = false;
-    		envelope.triggerGate(false);
-    	}
+    	if (voiceIds.indexOf(k.which) !== -1){
+            for (var i = 0; i < voices.length; i++){
+                if (voices[i].id === k.which){
+                    voices[i].stop();
+                }
+            }
+        }    	
     });
 
     $('#playButton').click(function(){
