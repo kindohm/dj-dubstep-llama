@@ -2,6 +2,15 @@
 <html>
 
 <head>
+    <style>
+        .bg1{
+            background: url(llama.jpg);
+        }
+
+        .bg2{
+            background: url(llama2.jpg);
+        }
+    </style>
 	<script type="text/javascript" src="js/jquery/jquery-1.9.0.min.js"></script>
 	<script type="text/javascript" src="js/jquery/mousewheel.js"></script>
 	<script type="text/javascript" src="js/audiolibjs/audiolib.js"></script>
@@ -23,6 +32,23 @@ var snareSample = atob(snare);
 var hatSample = atob(hat1);
 var hat2Sample = atob(hat2);
 var synthSample = atob(synthRaw);
+
+
+$(document).ready(function(){
+
+    setInterval(function(){
+        if (!playing) return;
+        
+        if ($('body').attr('class') != 'bg1'){
+            $('body').attr('class', 'bg1');
+        } else {
+            $('body').attr('class', 'bg2');
+        }
+
+    }, 428.5);
+
+
+});
 
 var drumSequence = {
 	steps: [
@@ -238,7 +264,7 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
 	</style>
 </head>
 
-<body>
+<body class="bg1">
 	<ul>
 		<li>Press any key on the keyboard to play a note. Keys don't really map to a real note yet. </li>
 		<li>Use the mouse wheel to increase or decrease wobble speed.</li>
