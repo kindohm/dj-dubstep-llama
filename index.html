@@ -22,7 +22,7 @@
     <script type="text/javascript" src="js/samples/synthraw.js"></script>
 	<script type="text/javascript">
 
-var device, keyIsDown = false, chorusL, chorusR, envelope, voices = [], voiceIds = [],
+var device, freePlay, keyIsDown = false, chorusL, chorusR, envelope, seqVoices = [], voices = [], voiceIds = [],
 	wobbleLfo, tempo = 140, wobbleStep = 2, filter, cutoff = 6000, reverb, synthReverb, delay,
 	kickSampler, snareSampler, hatSampler, hat2Sampler, synthSampler, tickCounter = 1, beatFractionConst, stepIndex = 100,
     playing = false;
@@ -47,8 +47,14 @@ $(document).ready(function(){
 
     }, 428.5);
 
-
 });
+
+var voiceSequence = {
+    steps: [
+        {step: 0, hz: 60, length: 24 },
+        {step: 24, hz: 70, length: 8 },
+    ]
+};
 
 var drumSequence = {
 	steps: [
@@ -91,19 +97,6 @@ var audioCallback = function(buffer, channels){
 	for (var i = 0; i < buffer.length; i+=2) {
 		sample = 0;
 
-        for (v = 0; v < voices.length; v++){
-            voices[v].generate();
-            sample += voices[v].getMix() / voices.length;
-        }
-
-		if (wobbleLfo.frequency !== 0){
-			wobbleLfo.generate();
-			filter.cutoff = cutoff * ((wobbleLfo.getMix() + 1) * 0.5);
-		}
-
-		filter.pushSample(sample);
-		sample = filter.getMix();
-
     	tickCounter = tickCounter + beatFractionConst;
 
     	if (tickCounter >= 1){
@@ -113,6 +106,19 @@ var audioCallback = function(buffer, channels){
     		if (stepIndex >= 32){
     			stepIndex = 0;
     		}
+
+            if (!freePlay) {
+                for (s = 0; s < voiceSequence.steps.length; s++) {
+                    step = voiceSequence.steps[s];
+                    if (step.step === stepIndex) {
+                        var voice = new Voice(device.sampleRate, 0, step.hz);
+                        voice.fixed = true;
+                        voice.samplesLeft = step.length / beatFractionConst;
+                        seqVoices.push(voice);
+                        wobbleLfo.reset();
+                    }
+                }
+            }
 
     		for (s = 0; s < drumSequence.steps.length; s++){
     			step = drumSequence.steps[s];
@@ -130,8 +136,42 @@ var audioCallback = function(buffer, channels){
                     }
     			}
     		}
-
     	}
+
+        // remove expired voices
+        for (v = seqVoices.length - 1; v >= 0; v--){
+            if (seqVoices[v].finished){
+                seqVoices.splice(v, 1);
+            }
+        }
+
+        for (v = voices.length - 1; v >= 0; v--){
+            if (voices[v].finished){
+                voices.splice(v);
+                voiceIds.splice(v);
+            }
+        }
+
+        if (freePlay) {
+
+            for (v = 0; v < voices.length; v++){
+                voices[v].generate();
+                sample += voices[v].getMix() / voices.length;
+            }
+        } else {
+            for (v = 0; v < seqVoices.length; v++){
+                seqVoices[v].generate();
+                sample += seqVoices[v].getMix();
+            }
+        }
+
+        if (wobbleLfo.frequency !== 0){
+            wobbleLfo.generate();
+            filter.cutoff = cutoff * ((wobbleLfo.getMix() + 1) * 0.5);
+        }
+
+        filter.pushSample(sample);
+        sample = filter.getMix();
 
 		kickSampler.generate();
     	kickSampleL = kickSampler.getMix(0) * .3;
@@ -161,14 +201,7 @@ var audioCallback = function(buffer, channels){
 		buffer[i] = reverb.getMix(0) + synthReverb.getMix(0) + kickSampleL;
 		buffer[i+1] = reverb.getMix(1) + synthReverb.getMix(1) + kickSampleR;
 
-        // remove expired voices
-        for (v = voices.length - 1; v >= 0; v--){
-            if (voices[v].finished){
-                console.log('removing '+ v);
-                voices.splice(v);
-                voiceIds.splice(v);
-            }
-        }
+
 	}
 }
 
@@ -233,6 +266,11 @@ window.addEventListener('load', function(){
         playing = !playing;
     });
 
+    $('#freePlayCheckbox').click(function(){
+        freePlay = $('#freePlayCheckbox').is(':checked');
+        seqVoices = [];
+    });
+
     processWobbleStep();
     
 }, true);
@@ -269,8 +307,13 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
 		<li>Use the mouse wheel to increase or decrease wobble speed.</li>
 		<li>Use the up arrow key to cycle through wobble types (sine, sawtooth, and inverted sawtooth).</li>
 	</ul>
+
     <p>
         <button id="playButton">play/pause</button>
+    </p>
+
+    <p>
+        <input type="checkbox" id="freePlayCheckbox" />&nbsp;Free play with keyboard
     </p>
 </body>
 
