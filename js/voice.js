@@ -3,6 +3,8 @@ function Voice(sampleRate, id, frequency){
 	this.id = id;
 	this.sampleRate = sampleRate;
 	this.frequency = frequency;
+	this.samplesLeft = 0;
+	this.fixedLength = false;
 
 	this.osc1 = audioLib.Oscillator(sampleRate, frequency);
     this.osc2 = audioLib.Oscillator(sampleRate, 0);
@@ -30,6 +32,8 @@ function Voice(sampleRate, id, frequency){
 
 Voice.prototype = {
 	id: 0,
+	fixedLength: false,
+	samplesLeft: 0,
 	decaying: false,
 	finished: false,
 	smpleRate: 44100,
@@ -58,10 +62,19 @@ Voice.prototype = {
 				+ this.osc2.getMix() * .5
 				+ this.osc3.getMix() * .3;
 			this.sample = this.sample * .4;
+
+			if (this.fixed) {
+				this.samplesLeft--;
+				if (this.samplesLeft <= 0) {
+					this.stop();
+				}
+			}
+
 		}
 
 		this.envelope.generate();
 		this.sample = this.sample * this.envelope.getMix();
+
 
 		if (this.sample === 0){
 			this.finished = true;
