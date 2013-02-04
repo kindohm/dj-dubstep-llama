@@ -195,7 +195,6 @@ window.addEventListener('load', function(){
     synthSampler = audioLib.Sampler(device.sampleRate);
     synthSampler.loadWav(synthSample, true);
 
-
     beatFractionConst = 1 / device.sampleRate * tempo / 60;
     beatFractionConst = beatFractionConst * 4;
 
