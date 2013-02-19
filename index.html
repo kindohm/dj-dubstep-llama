@@ -165,18 +165,18 @@ var audioCallback = function(buffer, channels){
           stepIndex = 0;
         }
 
-            if (!freePlay) {
-                for (s = 0; s < voiceSequence.steps.length; s++) {
-                    step = voiceSequence.steps[s];
-                    if (step.step === stepIndex) {
-                        var voice = new Voice(device.sampleRate, 0, step.hz);
-                        voice.fixed = true;
-                        voice.samplesLeft = step.length / beatFractionConst;
-                        seqVoices.push(voice);
-                        wobbleLfo.reset();
-                    }
-                }
+        if (!freePlay) {
+          for (s = 0; s < voiceSequence.steps.length; s++) {
+            step = voiceSequence.steps[s];
+            if (step.step === stepIndex) {
+              var voice = new Voice(device.sampleRate, 0, step.hz);
+              voice.fixed = true;
+              voice.samplesLeft = step.length / beatFractionConst;
+              seqVoices.push(voice);
+              wobbleLfo.reset();
             }
+          }
+        }
 
         for (s = 0; s < drumSequence.steps.length; s++){
           step = drumSequence.steps[s];
@@ -185,13 +185,13 @@ var audioCallback = function(buffer, channels){
               kickSampler.noteOn(step.hz);
             } else if (step.sampler === 'snare'){
               snareSampler.noteOn(step.hz);
-                    } else if (step.sampler === 'hat'){
-                        hatSampler.noteOn(step.hz);
-                    } else if (step.sampler === 'hat2'){
-                        hat2Sampler.noteOn(step.hz);
-                    } else if (step.sampler === 'synth'){
-                        synthSampler.noteOn(step.hz);
-                    }
+            } else if (step.sampler === 'hat'){
+                hatSampler.noteOn(step.hz);
+            } else if (step.sampler === 'hat2'){
+                hat2Sampler.noteOn(step.hz);
+            } else if (step.sampler === 'synth'){
+                synthSampler.noteOn(step.hz);
+            }
           }
         }
       }
