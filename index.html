@@ -112,6 +112,8 @@ var writeSortedSteps = function(){
 };
 
 var fixSustainedNotes = function (){
+  if (voiceSequence.steps.length <= 1) return;
+
   console.log('=========');
   var sorted = voiceSequence.steps.sort(function(a,b){
     return a.step - b.step;
@@ -119,20 +121,41 @@ var fixSustainedNotes = function (){
 
   for (var i = 0; i < sorted.length; i++) {
     sorted[i].ignore = false;
+    sorted[i].length = 1;
   }
 
-  for (var i = 1; i < sorted.length; i++){
+  console.log('evaluating...');
+  writeSortedSteps();
+
+  var startStep = sorted[0];
+  var currentLength = 2;
+  var currentStepAhead = 1;
+  for (var i = 1; i < sorted.length; i++) {
+
     var current = sorted[i];
-    var previous = sorted[i - 1];
-    if (previous.step === current.step - 1){
-      if (previous.hz === current.hz){
+    if (current.step === startStep.step + currentStepAhead){
+      if (current.hz === startStep.hz) {
+        startStep.length = currentLength;
         current.ignore = true;
+        currentLength++;
+        currentStepAhead++;
       }
+      else {
+        currentLength = 2;
+        startStep = current;
+        currentStepAhead = 1;
+      }
+    } else {
+      currentLength = 2;
+      startStep = current;
+      currentStepAhead = 1;
     }
+
   }
 
   console.log('');
   writeSortedSteps();
+  console.log('');
 }
 
 $(document).ready(function(){
@@ -181,9 +204,9 @@ $(document).ready(function(){
 
 var drumSequence = {
   steps: [
-    { step: 0, sampler: 'synth' , hz: 440 },
-    { step: 16, sampler: 'synth' , hz: 200 },
-    { step: 24, sampler: 'synth' , hz: 175 },
+    { step: 0, sampler: 'synth' , hz: 261.626 },
+    { step: 16, sampler: 'synth' , hz: 207.652 },
+    { step: 24, sampler: 'synth' , hz: 195.998 },
     { step: 0, sampler: 'kick', hz: 440 },
     { step: 2, sampler: 'hat', hz: 440 },
     { step: 3, sampler: 'kick', hz: 440 },
