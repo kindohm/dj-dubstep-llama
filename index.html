@@ -3,13 +3,15 @@
 
 <head>
     <style>
-        .bg1{
-            background: url(llama.jpg);
-        }
+.bg1{
+    background: url(llama.jpg);
+    background-size: 100%;
+}
 
-        .bg2{
-            background: url(llama2.jpg);
-        }
+.bg2{
+    background: url(llama2.jpg);
+    background-size: 100%;
+}
     </style>
   <script type="text/javascript" src="js/jquery/jquery-1.9.0.min.js"></script>
   <script type="text/javascript" src="js/jquery/mousewheel.js"></script>
@@ -453,6 +455,7 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
   <style>
   body{
     font-family: Helvetica, Arial, sans-serif;
+    min-width: 800px;
   }
   span.rowLabel {
     width: 40px;
