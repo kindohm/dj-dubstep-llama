@@ -7,26 +7,26 @@ function Voice(sampleRate, id, frequency){
   this.fixedLength = false;
 
   this.osc1 = audioLib.Oscillator(sampleRate, frequency);
-    this.osc2 = audioLib.Oscillator(sampleRate, 0);
-    this.osc3 = audioLib.Oscillator(sampleRate, 0);
+  this.osc2 = audioLib.Oscillator(sampleRate, 0);
+  this.osc3 = audioLib.Oscillator(sampleRate, 0);
 
-    this.lfo1 = audioLib.Oscillator(sampleRate, 200);
-    this.lfo2 = audioLib.Oscillator(sampleRate, 190);
+  this.lfo1 = audioLib.Oscillator(sampleRate, 200);
+  this.lfo2 = audioLib.Oscillator(sampleRate, 190);
 
-    this.osc2.waveShape = 'sawtooth';
-    this.osc3.waveShape = 'square';
+  this.osc2.waveShape = 'sawtooth';
+  this.osc3.waveShape = 'square';
 
-    this.osc2.frequency = this.osc3.frequency = this.osc1.frequency * 3;
-    this.lfo1.frequency = this.osc1.frequency * 6;
-    this.lfo2.frequency = this.osc1.frequency * 7;
+  this.osc2.frequency = this.osc3.frequency = this.osc1.frequency * 3;
+  this.lfo1.frequency = this.osc1.frequency * 6;
+  this.lfo2.frequency = this.osc1.frequency * 7;
 
-    this.envelope = audioLib.ADSREnvelope(sampleRate, 5, 1, 1, 50, null, null);
+  this.envelope = audioLib.ADSREnvelope(sampleRate, 5, 1, 1, 50, null, null);
 
-    this.sample = 0;
-    this.decaying = false;
-    this.finished = false;
+  this.sample = 0;
+  this.decaying = false;
+  this.finished = false;
 
-    this.envelope.triggerGate(true);
+  this.envelope.triggerGate(true);
 
 }
 
