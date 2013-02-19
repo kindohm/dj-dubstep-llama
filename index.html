@@ -22,6 +22,7 @@
   <script type="text/javascript" src="js/samples/hat1.js"></script>
   <script type="text/javascript" src="js/samples/hat2.js"></script>
   <script type="text/javascript" src="js/samples/stab.js"></script>
+  <script type="text/javascript" src="js/jquery.tabSlideOut.v1.3.js"></script>
   <script type="text/javascript">
 
 var device, freePlay, keyIsDown = false, chorusL, chorusR, envelope, seqVoices = [], voices = [], voiceIds = [],
@@ -167,6 +168,18 @@ $(document).ready(function(){
     }, 428.5);
 
     buildBassSequenceUI();
+
+     $('#controls').tabSlideOut({
+         tabHandle: '.handle',                              //class of the element that will be your tab
+         pathToTabImage: 'img/controls.png',          //path to the image for the tab (optionaly can be set using css)
+         imageHeight: '122px',                               //height of tab image
+         imageWidth: '40px',                               //width of tab image    
+         tabLocation: 'left',                               //side of screen where tab lives, top, right, bottom, or left
+         speed: 300,                                        //speed of animation
+         action: 'click',                                   //options: 'click' or 'hover', action to trigger animation
+         topPos: '200px',                                   //position from the top
+         fixedPosition: false                               //options: true makes it stick(fixed position) on scroll
+     });
 
     $('.bassNote').click(function (arg) {
       var newStep = {
@@ -381,6 +394,8 @@ window.addEventListener('load', function(){
       } else if (wobbleLfo.waveShape === 'sawtooth') {
         wobbleLfo.waveShape = 'sine';
       }
+    } else if (k.which === 32) {
+      playing = !playing
     } else {
       if (voiceIds.indexOf(k.which) === -1){
         var note = 'X';
@@ -449,6 +464,7 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
   body{
     font-family: Helvetica, Arial, sans-serif;
     min-width: 800px;
+    height: 100%;
   }
   span.rowLabel {
     width: 40px;
@@ -465,26 +481,46 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
   }
 
   .altRow {
-    background: #eee;
+    background-color: rgba(210, 210, 210, 0.5);
+    margin-bottom: 5px;
+    padding: 2px;
+  }
+
+  .row {
+    margin-bottom: 5px;
+    padding: 2px;
+  }
+
+  #controls {
+    background-color: rgba(250, 250, 250, 0.95);
+
+    border: solid 1px #ccc;
+    padding: 10px;
   }
   </style>
 </head>
 
 <body class="bg1">
-  <ul>
-    <li>Use the mouse wheel to increase or decrease wobble speed.</li>
-    <li>Use the up arrow key to cycle through wobble types (sine, sawtooth, and inverted sawtooth).</li>
-  </ul>
+  <div id="controls">
+    <a class="handle">content...</a>
+    <div id="controlsInternal">
+      <ul>
+        <li>Use the mouse wheel to increase or decrease wobble speed.</li>
+        <li>Use the up arrow key to cycle through wobble types (sine, sawtooth, and inverted sawtooth).</li>
+        <li>Use the space bar to play/pause</li>
+      </ul>
 
-    <p>
+      <p>
         <button id="playButton">play/pause</button>
-    </p>
+      </p>
 
-    <p>
+      <p>
         <input type="checkbox" id="freePlayCheckbox" />&nbsp;Free play with 
           keyboard (number keys 1 through 8)
-    </p>
+      </p>
 
-    <div id="bassSequence"></div>
+      <div id="bassSequence"></div>
+    </div>
+  </div>
 </body>
 </html>
