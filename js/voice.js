@@ -17,8 +17,11 @@ function Voice(sampleRate, id, frequency){
   this.osc3.waveShape = 'square';
 
   this.osc2.frequency = this.osc3.frequency = this.osc1.frequency * 3;
-  this.lfo1.frequency = this.osc1.frequency * 6;
-  this.lfo2.frequency = this.osc1.frequency * 7;
+  this.lfo1.frequency = this.osc1.frequency * 4.0;
+  this.lfo2.frequency = this.osc1.frequency * 7.0;
+
+  this.lfo1.waveShape = 'sine';
+  this.lfo2.waveShape = 'sawtooth';
 
   this.envelope = audioLib.ADSREnvelope(sampleRate, 5, 1, 1, 50, null, null);
 

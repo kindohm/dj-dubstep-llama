@@ -116,7 +116,6 @@ var writeSortedSteps = function(){
 var fixSustainedNotes = function (){
   if (voiceSequence.steps.length <= 1) return;
 
-  console.log('=========');
   var sorted = voiceSequence.steps.sort(function(a,b){
     return a.step - b.step;
   });
@@ -125,9 +124,6 @@ var fixSustainedNotes = function (){
     sorted[i].ignore = false;
     sorted[i].length = 1;
   }
-
-  console.log('evaluating...');
-  writeSortedSteps();
 
   var startStep = sorted[0];
   var currentLength = 2;
@@ -155,9 +151,6 @@ var fixSustainedNotes = function (){
 
   }
 
-  console.log('');
-  writeSortedSteps();
-  console.log('');
 }
 
 $(document).ready(function(){
@@ -187,7 +180,6 @@ $(document).ready(function(){
       for (var i = 0; i < voiceSequence.steps.length; i++){
         var existingStep = voiceSequence.steps[i];
         if (existingStep.step === newStep.step) {
-          console.log('found');
           existingStep.hz = newStep.hz;
           found = true;
           break;
@@ -358,6 +350,7 @@ window.addEventListener('load', function(){
   device = audioLib.AudioDevice(audioCallback, 2);
   wobbleLfo = audioLib.Oscillator(device.sampleRate, 0);
   wobbleLfo.waveShape = 'sine';
+  wobbleLfo.phaseOffset = 45;
 
   filter = audioLib.IIRFilter(device.sampleRate, cutoff);
   bandPass = audioLib.IIRFilter(device.sampleRate, 3000, 0.5, 2);
