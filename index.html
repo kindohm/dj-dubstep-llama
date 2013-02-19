@@ -108,10 +108,11 @@ var writeSortedSteps = function(){
     console.log('step: ' + step.step + ', length: ' + step.length + ' hz: ' + step.hz + ', ignore: ' + step.ignore);
   }
 
+  return;
 };
 
 var fixSustainedNotes = function (){
-  console.log('');
+  console.log('=========');
   var sorted = voiceSequence.steps.sort(function(a,b){
     return a.step - b.step;
   });
@@ -120,27 +121,18 @@ var fixSustainedNotes = function (){
     sorted[i].ignore = false;
   }
 
-  for (var i = 0; i < sorted.length; i++){
+  for (var i = 1; i < sorted.length; i++){
     var current = sorted[i];
-    var nextIndex = i + 1;
-
-    if (nextIndex === sorted.length) {
-      break;
-    }
-
-    current.length = 1;
-
-    for (var n = nextIndex; n < sorted.length; n++) {
-      var next = sorted[n];
-      if (next.step === n && next.hz === current.hz) {
-        current.length += 1;
-        next.ignore = true;
-      }
-      else {
-        break;
+    var previous = sorted[i - 1];
+    if (previous.step === current.step - 1){
+      if (previous.hz === current.hz){
+        current.ignore = true;
       }
     }
-  } 
+  }
+
+  console.log('');
+  writeSortedSteps();
 }
 
 $(document).ready(function(){
@@ -363,24 +355,35 @@ window.addEventListener('load', function(){
   beatFractionConst = beatFractionConst * 4;
 
   $(document).keydown(function(k){
+    if (k.which === 38) {
+      if (wobbleLfo.waveShape === 'sine') {
+        wobbleLfo.waveShape = 'invSawtooth';
+      } else if (wobbleLfo.waveShape === 'invSawtooth'){
+        wobbleLfo.waveShape = 'sawtooth';
+      } else if (wobbleLfo.waveShape === 'sawtooth') {
+        wobbleLfo.waveShape = 'sine';
+      }
+    } else {
+      if (voiceIds.indexOf(k.which) === -1){
+        var note = 'X';
+        if (k.which === 49) note = 'C1';
+        else if (k.which === 50) note = 'D1';
+        else if (k.which === 51) note = 'Eb1';
+        else if (k.which === 52) note = 'F1';
+        else if (k.which === 53) note = 'G1';
+        else if (k.which === 54) note = 'Ab1';
+        else if (k.which === 55) note = 'Bb1';
+        else if (k.which === 56) note = 'C2';
+        else note = 'X';
 
-  if (k.which === 38) {
-    if (wobbleLfo.waveShape === 'sine') {
-      wobbleLfo.waveShape = 'invSawtooth';
-    } else if (wobbleLfo.waveShape === 'invSawtooth'){
-      wobbleLfo.waveShape = 'sawtooth';
-    } else if (wobbleLfo.waveShape === 'sawtooth') {
-      wobbleLfo.waveShape = 'sine';
-    }
-  } else {
-    if (voiceIds.indexOf(k.which) === -1){
-        var voice = new Voice(device.sampleRate, k.which, k.which * 1.5);
+        var hz = getFrequency(note);
+        var voice = new Voice(device.sampleRate, k.which, hz);
         voices.push(voice);
         voiceIds.push(k.which);
+      }
     }
-  }
       
-});
+  });
 
     $(document).keyup(function(k){
       if (voiceIds.indexOf(k.which) !== -1){
@@ -460,7 +463,8 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
     </p>
 
     <p>
-        <input type="checkbox" id="freePlayCheckbox" />&nbsp;Free play with keyboard
+        <input type="checkbox" id="freePlayCheckbox" />&nbsp;Free play with 
+          keyboard (number keys 1 through 8)
     </p>
 
     <div id="bassSequence"></div>
