@@ -141,8 +141,6 @@ var fixSustainedNotes = function (){
       }
     }
   } 
-
-  writeSortedSteps();
 }
 
 $(document).ready(function(){
@@ -340,49 +338,49 @@ var audioCallback = function(buffer, channels){
 
 window.addEventListener('load', function(){
 
-    device = audioLib.AudioDevice(audioCallback, 2);
-    wobbleLfo = audioLib.Oscillator(device.sampleRate, 0);
-    wobbleLfo.waveShape = 'sine';
+  device = audioLib.AudioDevice(audioCallback, 2);
+  wobbleLfo = audioLib.Oscillator(device.sampleRate, 0);
+  wobbleLfo.waveShape = 'sine';
 
-    filter = audioLib.IIRFilter(device.sampleRate, cutoff);
-    bandPass = audioLib.IIRFilter(device.sampleRate, 3000, 0.5, 2);
+  filter = audioLib.IIRFilter(device.sampleRate, cutoff);
+  bandPass = audioLib.IIRFilter(device.sampleRate, 3000, 0.5, 2);
 
-    reverb = audioLib.Reverb(device.sampleRate, 2, .5, .5, .6);
-    synthReverb = audioLib.Reverb(device.sampleRate, 2, .8, .5, .8);
+  reverb = audioLib.Reverb(device.sampleRate, 2, .5, .5, .6);
+  synthReverb = audioLib.Reverb(device.sampleRate, 2, .8, .5, .8);
 
-    kickSampler = audioLib.Sampler(device.sampleRate);
-    kickSampler.loadWav(kickSample, true);
-    snareSampler = audioLib.Sampler(device.sampleRate);
-    snareSampler.loadWav(snareSample, true);
-    hatSampler = audioLib.Sampler(device.sampleRate);
-    hatSampler.loadWav(hatSample, true);
-    hat2Sampler = audioLib.Sampler(device.sampleRate);
-    hat2Sampler.loadWav(hat2Sample, true);
-    synthSampler = audioLib.Sampler(device.sampleRate);
-    synthSampler.loadWav(synthSample, true);
+  kickSampler = audioLib.Sampler(device.sampleRate);
+  kickSampler.loadWav(kickSample, true);
+  snareSampler = audioLib.Sampler(device.sampleRate);
+  snareSampler.loadWav(snareSample, true);
+  hatSampler = audioLib.Sampler(device.sampleRate);
+  hatSampler.loadWav(hatSample, true);
+  hat2Sampler = audioLib.Sampler(device.sampleRate);
+  hat2Sampler.loadWav(hat2Sample, true);
+  synthSampler = audioLib.Sampler(device.sampleRate);
+  synthSampler.loadWav(synthSample, true);
 
-    beatFractionConst = 1 / device.sampleRate * tempo / 60;
-    beatFractionConst = beatFractionConst * 4;
+  beatFractionConst = 1 / device.sampleRate * tempo / 60;
+  beatFractionConst = beatFractionConst * 4;
 
-    $(document).keydown(function(k){
+  $(document).keydown(function(k){
 
-    if (k.which === 38) {
-      if (wobbleLfo.waveShape === 'sine') {
-        wobbleLfo.waveShape = 'invSawtooth';
-      } else if (wobbleLfo.waveShape === 'invSawtooth'){
-        wobbleLfo.waveShape = 'sawtooth';
-      } else if (wobbleLfo.waveShape === 'sawtooth') {
-        wobbleLfo.waveShape = 'sine';
-      }
-    } else {
-            if (voiceIds.indexOf(k.which) === -1){
-                var voice = new Voice(device.sampleRate, k.which, k.which * 1.5);
-                voices.push(voice);
-                voiceIds.push(k.which);
-            }
-      }
+  if (k.which === 38) {
+    if (wobbleLfo.waveShape === 'sine') {
+      wobbleLfo.waveShape = 'invSawtooth';
+    } else if (wobbleLfo.waveShape === 'invSawtooth'){
+      wobbleLfo.waveShape = 'sawtooth';
+    } else if (wobbleLfo.waveShape === 'sawtooth') {
+      wobbleLfo.waveShape = 'sine';
+    }
+  } else {
+    if (voiceIds.indexOf(k.which) === -1){
+        var voice = new Voice(device.sampleRate, k.which, k.which * 1.5);
+        voices.push(voice);
+        voiceIds.push(k.which);
+    }
+  }
       
-    });
+});
 
     $(document).keyup(function(k){
       if (voiceIds.indexOf(k.which) !== -1){
