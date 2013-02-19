@@ -33,6 +33,57 @@ var hatSample = atob(hat1);
 var hat2Sample = atob(hat2);
 var synthSample = atob(synthRaw);
 
+var getFrequency = function(note) {
+  if (note === 'C1') return 32.7032;
+  if (note === 'D1') return 36.7081;
+  if (note === 'Eb1') return 38.8909;
+  if (note === 'F1') return 43.6535;
+  if (note === 'G1') return 48.9994;
+  if (note === 'Ab1') return 51.9131;
+  if (note === 'Bb1') return 58.2705;
+  if (note === 'C2') return 65.4064;
+  return 440;
+};
+
+var buildBassSequenceUI = function(){
+
+  var div = $('#bassSequence');
+  var steps = 32;
+  var pitches = 8;
+
+  for (var row = 0; row < pitches; row++){
+    var newDiv = $('<div>');
+    div.prepend(newDiv);
+    var label = $('<span>');
+    label.text(row.toString());
+    newDiv.append(label);
+    for (var col = 0; col < steps; col++) {
+      var value = "C1";
+      if (row === 1) {
+        value = "D1";
+      } else if (row === 2) {
+        value = "Eb1";
+      } else if (row === 3) {
+        value = "F1";
+      } else if (row === 4) {
+        value = "G1";
+      } else if (row === 5) {
+        value = "Ab1";
+      } else if (row === 6){
+        value = "Bb1";
+      } else if (row === 7) {
+        value = "C2";
+      }
+      var input = $('<input class="bassNote" type="radio" name="' + col + '" value="' + value + '"">');
+      newDiv.append(input);
+      if (row === 0){
+        input.attr('checked', true);
+      }
+    }
+  }
+
+
+};
 
 $(document).ready(function(){
 
@@ -47,6 +98,13 @@ $(document).ready(function(){
 
     }, 428.5);
 
+    buildBassSequenceUI();
+
+    $('.bassNote').click(function (arg) {
+      console.log($(this).val());
+      console.log($(this).attr('name'));
+    });
+
 });
 
 var voiceSequence = {
@@ -58,28 +116,28 @@ var voiceSequence = {
 
 var drumSequence = {
   steps: [
-        { step: 0, sampler: 'synth' , hz: 440 },
-        { step: 16, sampler: 'synth' , hz: 200 },
-        { step: 24, sampler: 'synth' , hz: 175 },
+    { step: 0, sampler: 'synth' , hz: 440 },
+    { step: 16, sampler: 'synth' , hz: 200 },
+    { step: 24, sampler: 'synth' , hz: 175 },
     { step: 0, sampler: 'kick', hz: 440 },
-        { step: 2, sampler: 'hat', hz: 440 },
+    { step: 2, sampler: 'hat', hz: 440 },
     { step: 3, sampler: 'kick', hz: 440 },
-        { step: 6, sampler: 'hat2' , hz: 440 },
+    { step: 6, sampler: 'hat2' , hz: 440 },
     { step: 8, sampler: 'snare' , hz: 440 },
-        { step: 10, sampler: 'hat' , hz: 440 },
-        { step: 11, sampler: 'hat2' , hz: 440 },
-        { step: 14, sampler: 'hat2' , hz: 440 },
-        { step: 15, sampler: 'hat' , hz: 440 },
+    { step: 10, sampler: 'hat' , hz: 440 },
+    { step: 11, sampler: 'hat2' , hz: 440 },
+    { step: 14, sampler: 'hat2' , hz: 440 },
+    { step: 15, sampler: 'hat' , hz: 440 },
     { step: 16, sampler: 'kick' , hz: 440 },
-        { step: 19, sampler: 'hat' , hz: 440 },
-        { step: 22, sampler: 'hat2' , hz: 440 },
-        { step: 23, sampler: 'hat' , hz: 440 },
+    { step: 19, sampler: 'hat' , hz: 440 },
+    { step: 22, sampler: 'hat2' , hz: 440 },
+    { step: 23, sampler: 'hat' , hz: 440 },
     { step: 24, sampler: 'snare' , hz: 440 },
-        { step: 26, sampler: 'hat' , hz: 440 },
-        { step: 27, sampler: 'hat2' , hz: 440 },
-        { step: 29, sampler: 'hat2' , hz: 440 },
-        { step: 30, sampler: 'hat' , hz: 440 },
-        { step: 31, sampler: 'hat2' , hz: 440 },
+    { step: 26, sampler: 'hat' , hz: 440 },
+    { step: 27, sampler: 'hat2' , hz: 440 },
+    { step: 29, sampler: 'hat2' , hz: 440 },
+    { step: 30, sampler: 'hat' , hz: 440 },
+    { step: 31, sampler: 'hat2' , hz: 440 },
   ]
 };
 
@@ -314,5 +372,7 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
     <p>
         <input type="checkbox" id="freePlayCheckbox" />&nbsp;Free play with keyboard
     </p>
+
+    <div id="bassSequence"></div>
 </body>
 </html>
