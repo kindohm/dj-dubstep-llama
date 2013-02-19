@@ -50,34 +50,39 @@ var buildBassSequenceUI = function(){
   var div = $('#bassSequence');
   var steps = 32;
   var pitches = 9;
-
+  var cellClass = '';
   for (var row = 0; row < pitches; row++){
-    var newDiv = $('<div>');
+    rowClass = (row + 1) % 2 === 0 ? 'row' : 'altRow';
+    var newDiv = $('<div class="' + rowClass + '">');
     div.prepend(newDiv);
-    var label = $('<span>');
-    label.text(row.toString());
+    var value = "X";
+    if (row === 1) {
+      value = "C1";
+    } else if (row === 2) {
+      value = "D1";
+    } else if (row === 3) {
+      value = "Eb1";
+    } else if (row === 4) {
+      value = "F1";
+    } else if (row === 5) {
+      value = "G1";
+    } else if (row === 6){
+      value = "Ab1";
+    } else if (row === 7) {
+      value = "Bb1";
+    } else if (row === 8) {
+      value = "C2";
+    }
+
+    var label = $('<span class="rowLabel">');
+    label.text(value);
     newDiv.append(label);
     for (var col = 0; col < steps; col++) {
-      var value = "X";
-      if (row === 1) {
-        value = "C1";
-      } else if (row === 2) {
-        value = "D1";
-      } else if (row === 3) {
-        value = "Eb1";
-      } else if (row === 4) {
-        value = "F1";
-      } else if (row === 5) {
-        value = "G1";
-      } else if (row === 6){
-        value = "Ab1";
-      } else if (row === 7) {
-        value = "Bb1";
-      } else if (row === 8) {
-        value = "C2";
-      }
+      var cellClass = (col + 1) % 4 === 0 ? 'cell4' : 'cell';
+      var span = $('<span class="' + cellClass + '">');
       var input = $('<input class="bassNote" type="radio" name="' + col + '" value="' + value + '"">');
-      newDiv.append(input);
+      span.append(input);
+      newDiv.append(span);
       if (row === 0){
         input.attr('checked', true);
       }
@@ -89,12 +94,9 @@ var buildBassSequenceUI = function(){
 
 var voiceSequence = {
     steps: [ ]
-/*        {step: 0, hz: 60, length: 24 },
-        {step: 24, hz: 70, length: 8 },
-    ]
-    */
 };
 
+/* function for debugging purposes */
 var writeSortedSteps = function(){
 
   var sorted = voiceSequence.steps.sort(function(a,b){
@@ -427,6 +429,23 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
   <style>
   body{
     font-family: Helvetica, Arial, sans-serif;
+  }
+  span.rowLabel {
+    width: 40px;
+    display: inline-block;
+  }
+
+  span.cell, span.cell4 {
+    width: 21px;
+    display: inline-block;
+  }
+
+  span.cell4 {
+    margin-right: 5px;
+  }
+
+  .altRow {
+    background: #eee;
   }
   </style>
 </head>
