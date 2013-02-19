@@ -19,7 +19,7 @@
   <script type="text/javascript" src="js/samples/snare.js"></script>
   <script type="text/javascript" src="js/samples/hat1.js"></script>
   <script type="text/javascript" src="js/samples/hat2.js"></script>
-  <script type="text/javascript" src="js/samples/synthraw.js"></script>
+  <script type="text/javascript" src="js/samples/stab.js"></script>
   <script type="text/javascript">
 
 var device, freePlay, keyIsDown = false, chorusL, chorusR, envelope, seqVoices = [], voices = [], voiceIds = [],
@@ -31,7 +31,7 @@ var kickSample = atob(kick);
 var snareSample = atob(snare);
 var hatSample = atob(hat1);
 var hat2Sample = atob(hat2);
-var synthSample = atob(synthRaw);
+var synthSample = atob(stab);
 
 var getFrequency = function(note) {
   if (note === 'C1') return 32.7032;
@@ -204,9 +204,9 @@ $(document).ready(function(){
 
 var drumSequence = {
   steps: [
-    { step: 0, sampler: 'synth' , hz: 261.626 },
-    { step: 16, sampler: 'synth' , hz: 207.652 },
-    { step: 24, sampler: 'synth' , hz: 195.998 },
+    { step: 0, sampler: 'synth' , hz: 523.251 },
+    { step: 16, sampler: 'synth' , hz: 415.305 },
+    { step: 24, sampler: 'synth' , hz: 391.995 },
     { step: 0, sampler: 'kick', hz: 440 },
     { step: 2, sampler: 'hat', hz: 440 },
     { step: 3, sampler: 'kick', hz: 440 },
