@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+
+html {
+  margin: 0px;
+  padding: 0px;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+}
+
+#canvas {
+  background: #ffff00;
+}
+  </style>
+  <script type="text/javascript" src="js/jquery/jquery-1.9.0.min.js"></script>
+
+  <script type="text/javascript">
+
+var context, canvas;
+var degrees = 0;
+var width, height;
+
+var rotate = function(){
+  degrees += 0.005;
+
+  context.clearRect(0,0,canvas.width, canvas.height);
+  canvas.width = canvas.width;
+
+  context.save();
+  context.translate(width / 2, height / 2);
+  context.rotate(degrees);
+  context.translate(-width / 2, -height / 2);
+
+  context.fillStyle = '#ff0000';
+  context.beginPath();
+  context.moveTo(width/2, height/2);
+  context.lineTo(-width,-height*.333);
+  context.lineTo(width * .2, -height*.333);
+  context.lineTo(width/2, height/2);
+  context.closePath();
+  context.fill();
+
+  context.lineTo(width,-height);
+  context.lineTo(width * 2, 0);
+  context.lineTo(width/2, height/2);
+  context.closePath();
+  context.fill();
+
+  context.lineTo(width*2,height*1.8);
+  context.lineTo(width * .8, height * 2);
+  context.lineTo(width/2, height/2);
+  context.closePath();
+  context.fill();
+
+  context.lineTo(width*.1,height*1.366);
+  context.lineTo(-width * .333, height * .666);
+  context.lineTo(width/2, height/2);
+  context.closePath();
+  context.fill();
+
+  context.restore();
+
+
+var circleWidth = width*.7;
+
+var grd = context.createRadialGradient(width/2, height/2, 1, width/2, height/2, circleWidth);
+      grd.addColorStop(0, '#ffffff');
+      grd.addColorStop(1, 'transparent');
+
+            context.beginPath();
+      context.arc(width/2, height/2, circleWidth, 0, 2 * Math.PI, false);
+      context.fillStyle = grd;
+      context.fill();
+
+
+  var imgWidth = 800;
+  var imgHeight = 1023;
+
+  var img = new Image();
+  img.src = 'img/whitellama.png';
+  var scale = .5;
+  context.drawImage(img, width/2 - imgWidth/2*scale, height/2 - imgHeight/2*scale,
+    imgWidth*scale, imgHeight*scale);
+
+
+
+
+
+}
+
+
+
+$(document).ready(function(){
+
+  width = $(document).width();
+  height = $(document).height();
+  $('#canvas').attr('width', width);
+  $('#canvas').attr('height', height);
+
+  canvas = document.getElementById('canvas');
+  context = canvas.getContext('2d');
+
+  //rotate();
+  setInterval(rotate, 1000 / 60);
+});
+
+  </script>
+
+</head>
+<body>
+
+  <canvas id="canvas" />
+
+</body>
+</html>
