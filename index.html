@@ -156,16 +156,14 @@ var fixSustainedNotes = function (){
 
 $(document).ready(function(){
 
+  /*
     setInterval(function(){
         if (!playing) return;
-        
-        if ($('body').attr('class') != 'bg1'){
-            $('body').attr('class', 'bg1');
-        } else {
-            $('body').attr('class', 'bg2');
-        }
+  
+        // do any tempo-based stuff here        
 
     }, 428.5);
+*/
 
     buildBassSequenceUI();
 
@@ -458,13 +456,105 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
     processWobbleStep();
 });
 
+
+
+
+
+
+
+
+
+
+
+var context, canvas;
+var degrees = 0;
+var width, height, halfWidth, halfHeight;
+var imgWidth = 800;
+var imgHeight = 1023;
+var doubleWidth, doubleHeight;
+var circleWidth;
+var scale;
+var img = new Image();
+img.src = 'img/whitellama.png';
+var img2 = new Image();
+img2.src = 'img/big.png';
+
+var rotate = function(){
+  if (!playing & degrees !== 0) return;
+
+  degrees += 0.01;
+
+  context.clearRect(0,0,canvas.width, canvas.height);
+  canvas.width = canvas.width;
+
+  context.save();
+  context.translate(halfWidth, halfHeight);
+  context.rotate(degrees);
+  context.translate(-halfWidth, -halfHeight);
+
+  scale = 2.0;
+  context.drawImage(img2, -halfWidth, -halfHeight,
+    width * scale, height * scale);
+
+
+  context.restore();
+
+  var grd = context.createRadialGradient(halfWidth, halfHeight, 1, halfWidth, halfHeight, circleWidth);
+  grd.addColorStop(0, 'rgba(255, 255, 255, .8)');
+  grd.addColorStop(1, 'transparent');
+
+  context.beginPath();
+  context.arc(halfWidth, halfHeight, circleWidth, 0, 2 * Math.PI, false);
+  context.fillStyle = grd;
+  context.fill();
+
+  scale = Math.min(.5, width * .7 / imgWidth);
+  context.drawImage(img, halfWidth - imgWidth / 2 * scale, halfHeight - imgHeight / 2 * scale,
+    imgWidth * scale, imgHeight * scale);
+}
+
+var calculateSizes = function(){
+  width = $(window).width();
+  height = $(window).height();
+  halfWidth = width * 0.5;
+  halfHeight = height * 0.5;
+  doubleWidth = width * 2;
+  doubleHeight = height * 2;
+  $('#canvas').attr('width', width);
+  $('#canvas').attr('height', height);
+  circleWidth = width*.7;
+};
+
+$(document).ready(function(){
+
+  calculateSizes();
+
+  canvas = document.getElementById('canvas');
+  context = canvas.getContext('2d');
+
+  setInterval(rotate, 1000 / 30);
+  
+  $(window).resize(function(){
+    calculateSizes();
+  });
+});
+
+
+
+
+
+
+
+
+
   </script>
   
   <style>
   body{
     font-family: Helvetica, Arial, sans-serif;
     min-width: 800px;
-    height: 100%;
+    padding: 0px;
+    margin: 0px;
   }
   span.rowLabel {
     width: 40px;
@@ -492,15 +582,27 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
   }
 
   #controls {
-    background-color: rgba(250, 250, 250, 0.95);
+    background-color: rgba(250, 250, 250, 0.90);
 
     border: solid 1px #ccc;
     padding: 10px;
   }
+
+  #canvas {
+    z-index: 5;
+  }
+
+  #top {
+    z-index: 50;
+  }
   </style>
 </head>
 
-<body class="bg1">
+<body>
+  <div>
+  <canvas id="canvas" />
+</div>
+  <div id="top">
   <div id="controls">
     <a class="handle">content...</a>
     <div id="controlsInternal">
@@ -522,5 +624,6 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
       <div id="bassSequence"></div>
     </div>
   </div>
+</div>
 </body>
 </html>

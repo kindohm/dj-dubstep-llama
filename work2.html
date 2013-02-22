@@ -26,15 +26,16 @@ var degrees = 0;
 var width, height, halfWidth, halfHeight;
 var imgWidth = 800;
 var imgHeight = 1023;
-var doubleWidth, doubleHeight, thirdHeight, twoThirdsHeight, thirdWidth;
-var eightTenthsWidth, bigHeight, medHeight, tenthWidth;
+var doubleWidth, doubleHeight;
 var circleWidth;
-
+var scale;
 var img = new Image();
 img.src = 'img/whitellama.png';
+var img2 = new Image();
+img2.src = 'img/big.png';
 
 var rotate = function(){
-  degrees += 0.005;
+  degrees += 0.01;
 
   context.clearRect(0,0,canvas.width, canvas.height);
   canvas.width = canvas.width;
@@ -44,38 +45,10 @@ var rotate = function(){
   context.rotate(degrees);
   context.translate(-halfWidth, -halfHeight);
 
-  context.fillStyle = '#ff0000';
-  context.beginPath();
-  context.moveTo(halfWidth, halfHeight);
-  context.lineTo(-width,-thirdHeight);
-  context.lineTo(doubleWidth, -thirdHeight);
-  context.lineTo(halfWidth, halfHeight);
-  context.closePath();
-  context.fill();
+  scale = 2.0;
+  context.drawImage(img2, -halfWidth, -halfHeight,
+    width * scale, height * scale);
 
-  context.beginPath();
-  context.moveTo(halfWidth, halfHeight);
-  context.lineTo(width,-height);
-  context.lineTo(doubleWidth, 0);
-  context.lineTo(halfWidth, halfHeight);
-  context.closePath();
-  context.fill();
-
-  context.beginPath();
-  context.moveTo(halfWidth, halfHeight);
-  context.lineTo(doubleWidth,bigHeight);
-  context.lineTo(eightTenthsWidth, doubleHeight);
-  context.lineTo(halfWidth, halfHeight);
-  context.closePath();
-  context.fill();
-
-  context.beginPath();
-  context.moveTo(halfWidth, halfHeight);
-  context.lineTo(tenthWidth,medHeight);
-  context.lineTo(-thirdWidth, twoThirdsHeight);
-  context.lineTo(halfWidth, halfHeight);
-  context.closePath();
-  context.fill();
 
   context.restore();
 
@@ -88,7 +61,7 @@ var rotate = function(){
   context.fillStyle = grd;
   context.fill();
 
-  var scale = Math.min(.5, width * .7 / imgWidth);
+  scale = Math.min(.5, width * .7 / imgWidth);
   context.drawImage(img, halfWidth - imgWidth / 2 * scale, halfHeight - imgHeight / 2 * scale,
     imgWidth * scale, imgHeight * scale);
 }
@@ -100,13 +73,6 @@ var calculateSizes = function(){
   halfHeight = height * 0.5;
   doubleWidth = width * 2;
   doubleHeight = height * 2;
-  thirdHeight = height * 0.333;
-  twoThirdsHeight = height * 0.666;
-  thirdWidth = width * 0.333;
-  tenthWidth = width * 0.1;
-  eightTenthsWidth = width * 0.8;
-  medHeight = height * 1.366;
-  bigHeight = height * 1.8;
   $('#canvas').attr('width', width);
   $('#canvas').attr('height', height);
   circleWidth = width*.7;
@@ -119,7 +85,7 @@ $(document).ready(function(){
   canvas = document.getElementById('canvas');
   context = canvas.getContext('2d');
 
-  setInterval(rotate, 1000);
+  setInterval(rotate, 1000 / 30);
   
   $(window).resize(function(){
     calculateSizes();
