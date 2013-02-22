@@ -3,16 +3,45 @@ window.DJ = (function($){
 var module = {};
 module.playing = false;
 
-var device, freePlay, keyIsDown = false, chorusL, chorusR, envelope, seqVoices = [], voices = [], voiceIds = [],
-  wobbleLfo, tempo = 140, wobbleStep = 2, filter, cutoff = 6000, reverb, synthReverb, delay,
-  kickSampler, snareSampler, hatSampler, hat2Sampler, synthSampler, tickCounter = 1, beatFractionConst, stepIndex = 100;
+var device, /* audiolib.js device */
 
-var kickSample = atob(kick);
-var snareSample = atob(snare);
-var hatSample = atob(hat1);
-var hat2Sample = atob(hat2);
-var synthSample = atob(stab);
+    /* tempo vars for music tempo, wobble speed, etc */
+    tempo         = 140, 
+    wobbleStep    = 2,
+    tickCounter   = 1, 
+    stepIndex     = 100,
+    beatFractionConst, 
 
+    /* sampler objects for drum sequence */
+    kickSample    = atob(kick),
+    snareSample   = atob(snare),
+    hatSample     = atob(hat1),
+    hat2Sample    = atob(hat2),
+    synthSample   = atob(stab),
+    kickSampler, 
+    snareSampler, 
+    hatSampler, 
+    hat2Sampler, 
+    synthSampler,
+
+    /* effects */
+    wobbleLfo, 
+    filter, 
+    reverb, 
+    synthReverb, 
+    cutoff        = 6000, 
+
+    /* arrays to keep track of the bass sounds in play */
+    seqVoices     = [], 
+    voices        = [], 
+    voiceIds      = [],
+    voiceSequence = { steps: [] },
+
+    /* misc */
+    freePlay, 
+    keyIsDown     = false;
+
+/* convers a note string to Hz */
 var getFrequency = function(note) {
   if (note === 'C1') return 32.7032;
   if (note === 'D1') return 36.7081;
@@ -25,6 +54,7 @@ var getFrequency = function(note) {
   return 0;
 };
 
+/* builds the HTML UI for the sequencer */
 var buildBassSequenceUI = function(){
 
   var div = $('#bassSequence');
@@ -68,29 +98,10 @@ var buildBassSequenceUI = function(){
       }
     }
   }
-
-
 };
 
-var voiceSequence = {
-    steps: [ ]
-};
-
-/* function for debugging purposes */
-var writeSortedSteps = function(){
-
-  var sorted = voiceSequence.steps.sort(function(a,b){
-    return a.step - b.step;
-  });
-
-  for (var i = 0; i < sorted.length; i++) {
-    var step = sorted[i];
-    console.log('step: ' + step.step + ', length: ' + step.length + ' hz: ' + step.hz + ', ignore: ' + step.ignore);
-  }
-
-  return;
-};
-
+/* helper function that adjusts consecutive notes in the sequencer
+   that are at the same pitch to be a single sustained note */
 var fixSustainedNotes = function (){
   if (voiceSequence.steps.length <= 1) return;
 
@@ -126,51 +137,49 @@ var fixSustainedNotes = function (){
       startStep = current;
       currentStepAhead = 1;
     }
-
   }
-
 }
 
 $(document).ready(function(){
 
-    buildBassSequenceUI();
+  buildBassSequenceUI();
 
-     $('#controls').tabSlideOut({
-         tabHandle: '.handle',                              //class of the element that will be your tab
-         pathToTabImage: 'img/controls.png',          //path to the image for the tab (optionaly can be set using css)
-         imageHeight: '122px',                               //height of tab image
-         imageWidth: '40px',                               //width of tab image    
-         tabLocation: 'left',                               //side of screen where tab lives, top, right, bottom, or left
-         speed: 300,                                        //speed of animation
-         action: 'click',                                   //options: 'click' or 'hover', action to trigger animation
-         topPos: '200px',                                   //position from the top
-         fixedPosition: false                               //options: true makes it stick(fixed position) on scroll
-     });
+  $('#controls').tabSlideOut({
+    tabHandle: '.handle',
+    pathToTabImage: 'img/controls.png',
+    imageHeight: '122px',
+    imageWidth: '40px',
+    tabLocation: 'left',
+    speed: 300,
+    action: 'click',
+    topPos: '200px',
+    fixedPosition: false
+  });
 
-    $('.bassNote').click(function (arg) {
-      var newStep = {
-        step: parseInt($(this).attr('name')),
-        hz: getFrequency($(this).val()),
-        length: 1,
-        ignore: false
-      };
+  $('.bassNote').click(function (arg) {
+    var newStep = {
+      step: parseInt($(this).attr('name')),
+      hz: getFrequency($(this).val()),
+      length: 1,
+      ignore: false
+    };
 
-      var found = false;
-      for (var i = 0; i < voiceSequence.steps.length; i++){
-        var existingStep = voiceSequence.steps[i];
-        if (existingStep.step === newStep.step) {
-          existingStep.hz = newStep.hz;
-          found = true;
-          break;
-        }
+    var found = false;
+    for (var i = 0; i < voiceSequence.steps.length; i++){
+      var existingStep = voiceSequence.steps[i];
+      if (existingStep.step === newStep.step) {
+        existingStep.hz = newStep.hz;
+        found = true;
+        break;
       }
+    }
 
-      if (!found) {
-        voiceSequence.steps.push(newStep);
-      }
+    if (!found) {
+      voiceSequence.steps.push(newStep);
+    }
 
-      fixSustainedNotes();
-    });
+    fixSustainedNotes();
+  });
 
 });
 
@@ -417,8 +426,8 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
     wobbleStep += delta;
   }
 
-  wobbleStep = wobbleStep < 0 ? 0 : wobbleStep;
-  wobbleStep = wobbleStep > 8 ? 8 : wobbleStep;
+  wobbleStep = Math.max(0, wobbleStep);
+  wobbleStep = Math.min(wobbleStep, 8);
   processWobbleStep();
 });
 
