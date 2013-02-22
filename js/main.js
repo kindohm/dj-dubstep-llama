@@ -133,15 +133,6 @@ var fixSustainedNotes = function (){
 
 $(document).ready(function(){
 
-  /*
-    setInterval(function(){
-        if (!playing) return;
-  
-        // do any tempo-based stuff here        
-
-    }, 428.5);
-*/
-
     buildBassSequenceUI();
 
      $('#controls').tabSlideOut({
@@ -328,8 +319,6 @@ var audioCallback = function(buffer, channels){
 
     buffer[i] = reverb.getMix(0) + synthReverb.getMix(0) + kickSampleL;
     buffer[i+1] = reverb.getMix(1) + synthReverb.getMix(1) + kickSampleR;
-
-
   }
 }
 
@@ -404,12 +393,12 @@ window.addEventListener('load', function(){
   });
 
   $('#playButton').click(function(){
-      module.playing = !module.playing;
+    module.playing = !module.playing;
   });
 
   $('#freePlayCheckbox').click(function(){
-      freePlay = $('#freePlayCheckbox').is(':checked');
-      seqVoices = [];
+    freePlay = $('#freePlayCheckbox').is(':checked');
+    seqVoices = [];
   });
 
   processWobbleStep();
@@ -417,20 +406,20 @@ window.addEventListener('load', function(){
 }, true);
 
 var processWobbleStep = function(){
-    wobbleLfo.frequency = tempo / 60 * wobbleStep * 0.5;
-    filter.cutoff = cutoff;
+  wobbleLfo.frequency = tempo / 60 * wobbleStep * 0.5;
+  filter.cutoff = cutoff;
 };
 
 $(document).mousewheel(function(event, delta, deltaX, deltaY) {
+  wobbleStep += delta;
+
+  while (wobbleStep === 5 || wobbleStep === 7) {
     wobbleStep += delta;
+  }
 
-    while (wobbleStep === 5 || wobbleStep === 7) {
-      wobbleStep += delta;
-    }
-
-    wobbleStep = wobbleStep < 0 ? 0 : wobbleStep;
-    wobbleStep = wobbleStep > 8 ? 8 : wobbleStep;
-    processWobbleStep();
+  wobbleStep = wobbleStep < 0 ? 0 : wobbleStep;
+  wobbleStep = wobbleStep > 8 ? 8 : wobbleStep;
+  processWobbleStep();
 });
 
 
