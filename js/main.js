@@ -1,4 +1,4 @@
-window.DJ = (function(){
+window.DJ = (function($){
 
 var module = {};
 module.playing = false;
@@ -436,4 +436,4 @@ $(document).mousewheel(function(event, delta, deltaX, deltaY) {
 
 return module;
 
-})();
+})(jQuery);
