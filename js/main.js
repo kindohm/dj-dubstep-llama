@@ -393,26 +393,26 @@ window.addEventListener('load', function(){
       
   });
 
-    $(document).keyup(function(k){
-      if (voiceIds.indexOf(k.which) !== -1){
-            for (var i = 0; i < voices.length; i++){
-                if (voices[i].id === k.which){
-                    voices[i].stop();
-                }
-            }
-        }     
-    });
+  $(document).keyup(function(k){
+    if (voiceIds.indexOf(k.which) !== -1){
+      for (var i = 0; i < voices.length; i++){
+        if (voices[i].id === k.which){
+          voices[i].stop();
+        }
+      }
+     }     
+  });
 
-    $('#playButton').click(function(){
-        module.playing = !module.playing;
-    });
+  $('#playButton').click(function(){
+      module.playing = !module.playing;
+  });
 
-    $('#freePlayCheckbox').click(function(){
-        freePlay = $('#freePlayCheckbox').is(':checked');
-        seqVoices = [];
-    });
+  $('#freePlayCheckbox').click(function(){
+      freePlay = $('#freePlayCheckbox').is(':checked');
+      seqVoices = [];
+  });
 
-    processWobbleStep();
+  processWobbleStep();
     
 }, true);
 
