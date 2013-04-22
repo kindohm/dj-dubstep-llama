@@ -213,7 +213,7 @@ var drumSequence = {
 
 var audioCallback = function(buffer, channels){
   
-    if (!module.playing) return;
+  if (!module.playing) return;
 
   var sample = 0;
   var kickSampleL = 0;
@@ -302,23 +302,23 @@ var audioCallback = function(buffer, channels){
     sample = filter.getMix();
 
     kickSampler.generate();
-    kickSampleL = kickSampler.getMix(0) * .3;
-    kickSampleR = kickSampler.getMix(1) * .3;
+    kickSampleL = kickSampler.getMix(0) * .5;
+    kickSampleR = kickSampler.getMix(1) * .5;
 
     snareSampler.generate();
-    kickSampleL += snareSampler.getMix(0) * .3;
-    kickSampleR += snareSampler.getMix(1) * .3;
+    kickSampleL += snareSampler.getMix(0) * .5;
+    kickSampleR += snareSampler.getMix(1) * .5;
 
     hatSampler.generate();
-    kickSampleL += hatSampler.getMix(0) * .2;
-    kickSampleR += hatSampler.getMix(1) * .2;
+    kickSampleL += hatSampler.getMix(0) * .4;
+    kickSampleR += hatSampler.getMix(1) * .4;
 
     hat2Sampler.generate();
-    kickSampleL += hat2Sampler.getMix(0) * .15;
-    kickSampleR += hat2Sampler.getMix(1) * .15;
+    kickSampleL += hat2Sampler.getMix(0) * .35;
+    kickSampleR += hat2Sampler.getMix(1) * .35;
 
     synthSampler.generate();
-    synthL = synthSampler.getMix(0) * .3;
+    synthL = synthSampler.getMix(0) * .5;
 
     synthReverb.pushSample(synthL, 0);
     synthReverb.pushSample(synthL, 1);
@@ -333,7 +333,13 @@ var audioCallback = function(buffer, channels){
 
 window.addEventListener('load', function(){
 
-  device = audioLib.AudioDevice(audioCallback, 2);
+  var bufSize = 1024;
+  // firefox can't take such a short buffer run
+  if(navigator.userAgent.indexOf("Firefox")!=-1) {
+    bufSize = 4096;
+  }
+
+  device = audioLib.AudioDevice(audioCallback, 2, bufSize);
   wobbleLfo = audioLib.Oscillator(device.sampleRate, 0);
   wobbleLfo.waveShape = 'sine';
   wobbleLfo.phaseOffset = 45;
@@ -342,7 +348,7 @@ window.addEventListener('load', function(){
   bandPass = audioLib.IIRFilter(device.sampleRate, 3000, 0.5, 2);
 
   reverb = audioLib.Reverb(device.sampleRate, 2, .5, .5, .6);
-  synthReverb = audioLib.Reverb(device.sampleRate, 2, .8, .5, .8);
+  synthReverb = audioLib.Reverb(device.sampleRate, 2, .8, .5, .6);
 
   kickSampler = audioLib.Sampler(device.sampleRate);
   kickSampler.loadWav(kickSample, true);

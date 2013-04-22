@@ -58,13 +58,13 @@ Voice.prototype = {
       this.lfo1.generate();
       this.lfo2.generate();
 
-          this.osc2.fm = this.lfo1.getMix();
-          this.osc3.fm = this.lfo2.getMix();
+      this.osc2.fm = this.lfo1.getMix();
+      this.osc3.fm = this.lfo2.getMix();
 
       this.sample = this.osc1.getMix() * .5 
         + this.osc2.getMix() * .5
         + this.osc3.getMix() * .3;
-      this.sample = this.sample * .4;
+      this.sample = this.sample * .7;
 
       if (this.fixed) {
         this.samplesLeft--;
