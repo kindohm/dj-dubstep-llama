@@ -2,6 +2,7 @@ window.DJ = (function($){
 
 var module = {};
 module.playing = false;
+module.oscilloscope = new Array();
 
 var device, /* audiolib.js device */
 
@@ -328,6 +329,9 @@ var audioCallback = function(buffer, channels){
 
     buffer[i] = reverb.getMix(0) + synthReverb.getMix(0) + kickSampleL;
     buffer[i+1] = reverb.getMix(1) + synthReverb.getMix(1) + kickSampleR;
+
+    module.oscilloscope[i] = buffer[i];
+    module.oscilloscope[i+1] = buffer[i+1];
   }
 }
 
@@ -340,6 +344,8 @@ window.addEventListener('load', function(){
   }
 
   device = audioLib.AudioDevice(audioCallback, 2, bufSize);
+  module.oscilloscope = new Array(bufSize);
+
   wobbleLfo = audioLib.Oscillator(device.sampleRate, 0);
   wobbleLfo.waveShape = 'sine';
   wobbleLfo.phaseOffset = 45;

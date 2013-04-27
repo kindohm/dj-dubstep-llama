@@ -30,7 +30,6 @@ var rotate = function(){
   context.drawImage(img2, -halfWidth, -halfHeight,
     width * scale, height * scale);
 
-
   context.restore();
 
   var grd = context.createRadialGradient(halfWidth, halfHeight, 1, halfWidth, halfHeight, circleWidth);
@@ -59,14 +58,33 @@ var calculateSizes = function(){
   circleWidth = width*.7;
 };
 
+var drawOsc = function() {  
+  
+  var length, count, x, y; 
+  length = dj.oscilloscope.length;  
+  //context.clearRect(0, 0, width, height); 
+  context.beginPath(); 
+  context.moveTo(0, height / 2);  
+  for (count = 0; count < length; count++) { 
+    x = count / length * width;
+    y = dj.oscilloscope[count] * -height / 2 + height / 2;
+
+    context.lineTo(x, y);
+  }  
+  context.strokeStyle = '#ffffff';
+  context.stroke(); 
+
+}
+
 $(document).ready(function(){
 
   calculateSizes();
 
   canvas = document.getElementById('canvas');
   context = canvas.getContext('2d');
-
+4
   setInterval(rotate, 1000 / 30);
+  setInterval(drawOsc, 1000 / 30);
   
   $(window).resize(function(){
     calculateSizes();
