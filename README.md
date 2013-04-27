@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-dj-dubstep-llama
-================
-=======
 DJ Dubstep Llama
 ================
 
-You are viewing the gh-pages branch. View the live demo at http://kindohm.github.com/dj-dubstep-llama.
->>>>>>> gh-pages
+A dubstep audio synthesizer and sequncer in javascript.
