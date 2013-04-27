@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DJ Dubstep Llama">
+  <meta name="author" content="Mike Hodnick">
+  <title>DJ Dubstep Llama</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <script type="text/javascript" src="js/jquery/jquery-1.9.0.min.js"></script>
+  <script type="text/javascript" src="js/jquery/mousewheel.js"></script>
+  <script type="text/javascript" src="js/audiolibjs/audiolib.js"></script>
+  <script type="text/javascript" src="js/voice.js"></script>
+  <script type="text/javascript" src="js/samples/kick.js"></script>
+  <script type="text/javascript" src="js/samples/snare.js"></script>
+  <script type="text/javascript" src="js/samples/hat1.js"></script>
+  <script type="text/javascript" src="js/samples/hat2.js"></script>
+  <script type="text/javascript" src="js/samples/stab.js"></script>
+  <script type="text/javascript" src="js/jquery/jquery.tabSlideOut.v1.3.js"></script>
+  <script type="text/javascript" src="js/main.js"></script>
+  <script type="text/javascript" src="js/background.js"></script>
+</head>
+
+<body>
+  <div>
+    <canvas id="canvas" />
+  </div>
+  <div id="top">
+    <div id="controls">
+      <a class="handle">content...</a>
+      <div id="controlsInternal">
+        <ul>
+          <li>Use the mouse wheel to increase or decrease wobble speed.</li>
+          <li>Use the up arrow key to cycle through wobble types (sine, sawtooth, and inverted sawtooth).</li>
+          <li>Use the space bar to play/pause</li>
+        </ul>
+
+        <p>
+          <button id="playButton">play/pause</button>
+        </p>
+
+        <p>
+          <input type="checkbox" id="freePlayCheckbox" />&nbsp;Free play with 
+            keyboard (number keys 1 through 8)
+        </p>
+
+        <div id="bassSequence"></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

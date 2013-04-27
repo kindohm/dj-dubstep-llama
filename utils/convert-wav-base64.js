@@ -40,6 +40,4 @@ fs.open(wavFileName, 'r', function(status, fd) {
 
 
     });
-
-
 });
