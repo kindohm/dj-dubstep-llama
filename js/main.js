@@ -337,7 +337,7 @@ var audioCallback = function(buffer, channels){
 
 window.addEventListener('load', function(){
 
-  var bufSize = 4096;
+  var bufSize = 8192;
   // firefox can't take such a short buffer run
   if(navigator.userAgent.indexOf("Firefox")!=-1) {
     bufSize = 4096;
